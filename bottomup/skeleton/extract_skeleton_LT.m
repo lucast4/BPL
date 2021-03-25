@@ -15,7 +15,7 @@
 %    .S: [k x 1 cell] edge paths in the image 
 %
 function U = extract_skeleton(I,extra_junctions,bool_viz)
-    nj = 4; % num pixels in neighborhood of extra jhunctions to test, if no auto-extracted
+    nj = 5; % num pixels in neighborhood of extra jhunctions to test, if no auto-extracted
     % junctions found in this neighborhood, then include 
     
     if ~exist('bool_viz','var')
@@ -41,28 +41,22 @@ function U = extract_skeleton(I,extra_junctions,bool_viz)
           % snap this junction onto the nearest skeletion pt
           disp(['ADDING JUNCTION: ' num2str(jthis)]);
           disp('neighborhood (skel) before snapping')
-          tmp = T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2);
-          disp(tmp)
+          disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
           if T(jthis(1), jthis(2))==0
             % then snap to nearest skel point
             pts_in_T = find(T);
             [xinds, yinds] = ind2sub(size(T), pts_in_T);
-            % disp([xinds, yinds]);
-            % disp(size([xinds, yinds]))
             k = dsearchn(int16([xinds, yinds]), int16(jthis));
             jthis = [xinds(k) yinds(k)]; % snapped value
             disp(['new coordinates after snapping: ' num2str(jthis)]);
-            tmp = T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2);
             disp('New neighborhood (skel)')
-            disp(tmp);
+            disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
           end
           J(jthis(1), jthis(2)) = 1;
         end
       end
     end
-    % disp(sum(J(:)))
-    % assert(false)
-    % disp(J) % 1 at each feature. 
+
     U = trace_graph(T,J,I); % trace paths between features
     B = U.copy();
     U.clean_skeleton;
