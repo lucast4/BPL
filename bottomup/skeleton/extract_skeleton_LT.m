@@ -14,6 +14,7 @@
 %         S. It should be a cell array, because there could be two paths
 %    .S: [k x 1 cell] edge paths in the image 
 %
+
 function U = extract_skeleton(I,extra_junctions,bool_viz)
     nj = 5; % num pixels in neighborhood of extra jhunctions to test, if no auto-extracted
     % junctions found in this neighborhood, then include 
@@ -36,21 +37,33 @@ function U = extract_skeleton(I,extra_junctions,bool_viz)
       % check if any junctions to add are too close to current junctions
       for i=1:size(extra_junctions,1)
         jthis = extra_junctions(i,:);
-        tmp = J(jthis(1)-nj:jthis(1)+nj, jthis(2)-nj:jthis(2)+nj); % check if already have a junction close.
+
+        x1 = max(1, jthis(1)-nj);
+        x2 = max(1, jthis(2)-nj);
+        y1 = min(size(J,1), jthis(1)+nj);
+        y2 = min(size(J,2), jthis(2)+nj);
+        tmp = J(x1:y1, x2:y2); % check if already have a junction close.
         if ~any(tmp(:))
           % snap this junction onto the nearest skeletion pt
-          disp(['ADDING JUNCTION: ' num2str(jthis)]);
-          disp('neighborhood (skel) before snapping')
-          disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
+          if false
+            disp(['ADDING JUNCTION: ' num2str(jthis)]);
+            disp('neighborhood (skel) before snapping')
+            disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
+          end
           if T(jthis(1), jthis(2))==0
             % then snap to nearest skel point
             pts_in_T = find(T);
             [xinds, yinds] = ind2sub(size(T), pts_in_T);
             k = dsearchn(int16([xinds, yinds]), int16(jthis));
             jthis = [xinds(k) yinds(k)]; % snapped value
-            disp(['new coordinates after snapping: ' num2str(jthis)]);
-            disp('New neighborhood (skel)')
-            disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
+            if false
+              disp(['new coordinates after snapping: ' num2str(jthis)]);
+              disp('New neighborhood (skel)')
+              try
+                disp(T(jthis(1)-2:jthis(1)+2, jthis(2)-2:jthis(2)+2));
+              catch err
+              end
+            end
           end
           J(jthis(1), jthis(2)) = 1;
         end
