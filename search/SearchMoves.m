@@ -115,6 +115,14 @@ classdef SearchMoves < BetterHandle
                 this.M = SearchSplitMerge(this.M,this.lib,this.verbose);
            end
         end
+
+        function move_opt_rel(this)
+            % optimize the relations between strokes
+
+          Q = this.M.copy();
+          optimize_relations(this.searchPM, Q);
+          this.M = Q.copy();            
+        end
         
         function move_opt_dir_order_rel(this)
             % optimize the direction, order, and relations between strokes
